@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Resume Screener</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1e293b;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1500px;
+            margin: 30px auto;
+        }
+
+        .header {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #1e3a8a;
+        }
+
+        .header p {
+            color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .upload-card {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .upload-card h2 {
+            margin-top: 0;
+            color: #1e3a8a;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .button {
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background: #1d4ed8;
+        }
+
+        .button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            margin: 0 0 12px;
+            color: #64748b;
+        }
+
+        .stat-number {
+            font-size: 42px;
+            font-weight: bold;
+        }
+
+        .blue {
+            color: #2563eb;
+        }
+
+        .green {
+            color: #16a34a;
+        }
+
+        .red {
+            color: #dc2626;
+        }
+
+        .ranking-card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+        }
+
+        .ranking-card h2 {
+            margin-top: 0;
+            color: #0f172a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #eff6ff;
+            color: #1e3a8a;
+            text-align: left;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        td {
+            padding: 16px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 16px;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        .score {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .shortlisted {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .rejected {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .view-button {
+            background: #334155;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .view-button:hover {
+            background: #1e293b;
+        }
+
+        .filter-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .filter-row label {
+            margin: 0;
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .filter-select {
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #1e293b;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .error {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 800px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Smart Resume Screener</h1>
+        <p>AI-powered resume screening and candidate ranking</p>
+    </div>
+
+    <div class="upload-card">
+        <h2>Analyze Resumes</h2>
+
+        <form id="resumeForm">
+
+            <div class="form-group">
+                <label for="resumeFiles">Upload Resumes</label>
+                <input
+                    type="file"
+                    id="resumeFiles"
+                    name="resume_files"
+                    accept=".pdf"
+                    multiple
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="jobFile">Upload Job Description PDF</label>
+                <input
+                    type="file"
+                    id="jobFile"
+                    name="job_file"
+                    accept=".pdf"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="jobDescription">Or Enter Job Description</label>
+                <textarea
+                    id="jobDescription"
+                    name="job_description"
+                    placeholder="Enter job description here..."
+                ></textarea>
+            </div>
+
+            <button
+                type="submit"
+                class="button"
+                id="analyzeButton"
+            >
+                Analyze All Resumes
+            </button>
+
+            <div class="loading" id="loading">
+                Analyzing resumes. Please wait...
+            </div>
+
+            <div class="error" id="error"></div>
+
+        </form>
+    </div>
+
+    <div id="resultsSection" style="display:none;">
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <h3>Total Candidates</h3>
+                <div
+                    class="stat-number blue"
+                    id="totalCandidates"
+                >
+                    0
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Shortlisted</h3>
+                <div
+                    class="stat-number green"
+                    id="shortlistedCount"
+                >
+                    0
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Not Shortlisted</h3>
+                <div
+                    class="stat-number red"
+                    id="notShortlistedCount"
+                >
+                    0
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ranking-card">
+
+            <h2>Candidate Ranking</h2>
+
+            <div class="filter-row">
+                <label for="candidateFilter">Filter:</label>
+                <select id="candidateFilter" class="filter-select" onchange="applyFilter()">
+                    <option value="all">All Candidates</option>
+                    <option value="shortlisted">Shortlisted</option>
+                    <option value="not-shortlisted">Not Shortlisted</option>
+                </select>
+            </div>
+
+            <div id="rankingContainer"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+const form = document.getElementById("resumeForm");
+const analyzeButton = document.getElementById("analyzeButton");
+const loading = document.getElementById("loading");
+const errorBox = document.getElementById("error");
+const resultsSection = document.getElementById("resultsSection");
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    errorBox.style.display = "none";
+    loading.style.display = "block";
+    analyzeButton.disabled = true;
+
+    const resumeFiles =
+        document.getElementById("resumeFiles").files;
+
+    const jobFile =
+        document.getElementById("jobFile").files[0];
+
+    const jobDescription =
+        document.getElementById("jobDescription").value.trim();
+
+    if (resumeFiles.length === 0) {
+        showError("Please upload at least one resume.");
+        resetButton();
+        return;
+    }
+
+    if (!jobFile && !jobDescription) {
+        showError(
+            "Please upload a Job Description PDF or enter Job Description text."
+        );
+        resetButton();
+        return;
+    }
+
+    if (jobFile && jobDescription) {
+        showError(
+            "Please provide either Job Description PDF or text, not both."
+        );
+        resetButton();
+        return;
+    }
+
+    const formData = new FormData();
+
+    for (let i = 0; i < resumeFiles.length; i++) {
+        formData.append(
+            "resume_files",
+            resumeFiles[i]
+        );
+    }
+
+    if (jobFile) {
+        formData.append(
+            "job_file",
+            jobFile
+        );
+    }
+
+    if (jobDescription) {
+        formData.append(
+            "job_description",
+            jobDescription
+        );
+    }
+
+    try {
+
+        const response = await fetch(
+            `${API_URL}/analyze-resume`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            throw new Error(
+                data.error || "Failed to analyze resumes."
+            );
+        }
+
+        sessionStorage.setItem(
+            "rankingData",
+            JSON.stringify(data)
+        );
+
+        displayResults(data);
+
+    } catch (error) {
+
+        showError(
+            error.message ||
+            "Something went wrong while analyzing resumes."
+        );
+
+    } finally {
+
+        resetButton();
+
+    }
+
+});
+
+function displayResults(data) {
+
+    sessionStorage.setItem(
+        "rankingData",
+        JSON.stringify(data)
+    );
+
+    document.getElementById(
+        "totalCandidates"
+    ).textContent =
+        data.total_candidates || 0;
+
+    document.getElementById(
+        "shortlistedCount"
+    ).textContent =
+        data.shortlisted_count || 0;
+
+    document.getElementById(
+        "notShortlistedCount"
+    ).textContent =
+        data.not_shortlisted_count || 0;
+
+    document.getElementById("candidateFilter").value = "all";
+
+    renderCandidates(data, "all");
+
+    resultsSection.style.display = "block";
+}
+
+function applyFilter() {
+
+    const savedData =
+        sessionStorage.getItem("rankingData");
+
+    if (!savedData) {
+        return;
+    }
+
+    const data = JSON.parse(savedData);
+
+    const filter =
+        document.getElementById("candidateFilter").value;
+
+    renderCandidates(data, filter);
+}
+
+function renderCandidates(data, filter) {
+
+    const container =
+        document.getElementById("rankingContainer");
+
+    const candidates =
+        data.ranked_candidates || [];
+
+    let filteredCandidates = candidates;
+
+    if (filter === "shortlisted") {
+        filteredCandidates = candidates.filter(
+            candidate =>
+                candidate.analysis &&
+                candidate.analysis.shortlist === "Yes"
+        );
+    }
+
+    if (filter === "not-shortlisted") {
+        filteredCandidates = candidates.filter(
+            candidate =>
+                !candidate.analysis ||
+                candidate.analysis.shortlist !== "Yes"
+        );
+    }
+
+    if (filteredCandidates.length === 0) {
+
+        container.innerHTML = `
+            <div class="empty">
+                No candidates found for this filter.
+            </div>
+        `;
+
+        return;
+    }
+
+    let html = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Candidate</th>
+                    <th>Match Score</th>
+                    <th>Decision</th>
+                    <th>View</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    filteredCandidates.forEach((candidate, index) => {
+
+        const analysis =
+            candidate.analysis || {};
+
+        const candidateInfo =
+            candidate.candidate || {};
+
+        const name =
+            candidateInfo.name ||
+            candidate.filename ||
+            "Unknown Candidate";
+
+        const score =
+            Number(
+                analysis.match_score || 0
+            ).toFixed(1);
+
+        const shortlist =
+            analysis.shortlist === "Yes";
+
+        const rank =
+            candidate.rank || index + 1;
+
+        html += `
+            <tr>
+                <td>
+                    <strong>#${rank}</strong>
+                </td>
+
+                <td>
+                    ${escapeHtml(candidate.filename || name)}
+                </td>
+
+                <td class="score">
+                    ${score}/10
+                </td>
+
+                <td class="${
+                    shortlist
+                        ? "shortlisted"
+                        : "rejected"
+                }">
+                    ${
+                        shortlist
+                            ? "✓ Shortlisted"
+                            : "✕ Not Shortlisted"
+                    }
+                </td>
+
+                <td>
+                    <button
+                        class="view-button"
+                        onclick="viewCandidate(${rank})"
+                    >
+                        View
+                    </button>
+                </td>
+            </tr>
+        `;
+
+    });
+
+    html += `
+            </tbody>
+        </table>
+    `;
+
+    container.innerHTML = html;
+}
+
+function viewCandidate(rank) {
+
+    const savedData =
+        sessionStorage.getItem("rankingData");
+
+    if (!savedData) {
+        return;
+    }
+
+    const data =
+        JSON.parse(savedData);
+
+    const candidate =
+        (data.ranked_candidates || []).find(
+            item => Number(item.rank) === Number(rank)
+        );
+
+    if (!candidate) {
+        return;
+    }
+
+    sessionStorage.setItem(
+        "selectedCandidate",
+        JSON.stringify(candidate)
+    );
+
+    window.location.href =
+        "candidate-details.html";
+}
+
+function showError(message) {
+
+    errorBox.textContent = message;
+    errorBox.style.display = "block";
+
+}
+
+function resetButton() {
+
+    loading.style.display = "none";
+    analyzeButton.disabled = false;
+
+}
+
+function escapeHtml(text) {
+
+    if (
+        text === null ||
+        text === undefined
+    ) {
+        return "";
+    }
+
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+window.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        const savedData =
+            sessionStorage.getItem(
+                "rankingData"
+            );
+
+        if (!savedData) {
+            return;
+        }
+
+        try {
+
+            const data =
+                JSON.parse(savedData);
+
+            if (
+                data &&
+                data.ranked_candidates
+            ) {
+                displayResults(data);
+            }
+
+        } catch (error) {
+
+            sessionStorage.removeItem(
+                "rankingData"
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
