@@ -7,6 +7,7 @@
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
+- [Demo Video](#-demo-video)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
 - [🤖 LLM Prompts & Prompt Engineering](#-llm-prompts--prompt-engineering)
@@ -28,6 +29,14 @@
 ## 🚀 Overview
 
 **Smart Resume Screener** solves the recruitment bottleneck by automatically analyzing candidate resumes against any Job Description (JD). Utilizing Google's state-of-the-art **Gemini 3.6 Flash** model, it extracts structured requirement criteria, evaluates candidate qualifications, identifies matched vs. missing skills, assigns an objective match score (0–10), and produces automated shortlisting decisions with AI justifications.
+
+---
+
+## 🎥 Demo Video
+
+Watch the complete demonstration of Smart Resume Screener in action:
+
+🎬 **[Watch Demo Video on Google Drive](https://drive.google.com/file/d/1QeF49nErVZ1rSWrkW0q10KDFRTvrd_wH/view?usp=sharing)**
 
 ---
 
