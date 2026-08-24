@@ -1,18 +1,49 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader, X, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
+import { api, Job } from '../api';
 
 type UploadFile = {
-  id: string;
+  id: string; // candidate_id
   name: string;
-  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  status: 'QUEUED' | 'UPLOADING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
   progress: number;
+  error?: string;
+  fileObj?: File;
 };
 
 export default function Upload() {
+  const [job, setJob] = useState<Job | null>(null);
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+
+  useEffect(() => {
+    // Fetch a job to assign resumes to
+    api.getJobs().then(jobs => {
+      if (jobs.length > 0) setJob(jobs[0]);
+    }).catch(console.error);
+  }, []);
+
+  const handleFiles = (newFiles: File[]) => {
+    if (!job) {
+      alert("No active job found. Please create a job first.");
+      return;
+    }
+
+    const uploadedFiles: UploadFile[] = newFiles.map(f => ({
+      id: Math.random().toString(36).substr(2, 9), // Generate temporary candidate ID
+      name: f.name,
+      status: 'QUEUED',
+      progress: 0,
+      fileObj: f
+    }));
+    
+    setFiles(prev => [...prev, ...uploadedFiles]);
+    
+    // Process queue
+    uploadedFiles.forEach(f => processFile(f, job.id));
+  };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -21,37 +52,38 @@ export default function Upload() {
     const droppedFiles = Array.from(e.dataTransfer.files).filter(f => 
       f.type === 'application/pdf' || f.name.endsWith('.docx') || f.name.endsWith('.txt')
     );
-    
-    if (droppedFiles.length > 0) {
-      const newFiles: UploadFile[] = droppedFiles.map((f, i) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        name: f.name,
-        status: 'QUEUED',
-        progress: 0
-      }));
-      setFiles(prev => [...prev, ...newFiles]);
-      
-      // Simulate processing
-      newFiles.forEach((f, i) => simulateProcessing(f.id, i * 1500));
-    }
-  }, []);
+    if (droppedFiles.length > 0) handleFiles(droppedFiles);
+  }, [job]);
 
-  const simulateProcessing = (id: string, delay: number) => {
-    setTimeout(() => {
-      setFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'PROCESSING', progress: 10 } : f));
+  const processFile = async (file: UploadFile, jobId: string) => {
+    if (!file.fileObj) return;
+
+    // 1. Upload Resume
+    setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: 'UPLOADING', progress: 10 } : f));
+    try {
+      await api.uploadResume(file.id, file.fileObj);
       
-      let prog = 10;
-      const interval = setInterval(() => {
-        prog += Math.random() * 20;
-        if (prog >= 100) {
-          prog = 100;
-          clearInterval(interval);
-          setFiles(prev => prev.map(f => f.id === id ? { ...f, status: 'COMPLETED', progress: 100 } : f));
-        } else {
-          setFiles(prev => prev.map(f => f.id === id ? { ...f, progress: prog } : f));
-        }
-      }, 500);
-    }, delay);
+      // 2. Generate Match
+      setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: 'PROCESSING', progress: 40 } : f));
+      
+      // Simulate progress while waiting for LLM
+      const progressInterval = setInterval(() => {
+        setFiles(prev => prev.map(f => {
+          if (f.id === file.id && f.progress < 90) {
+            return { ...f, progress: f.progress + 5 };
+          }
+          return f;
+        }));
+      }, 2000);
+
+      await api.generateMatch(file.id, jobId);
+      
+      clearInterval(progressInterval);
+      setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: 'COMPLETED', progress: 100 } : f));
+    } catch (err) {
+      console.error(err);
+      setFiles(prev => prev.map(f => f.id === file.id ? { ...f, status: 'FAILED', progress: 0, error: 'API Error' } : f));
+    }
   };
 
   const completedCount = files.filter(f => f.status === 'COMPLETED').length;
@@ -90,7 +122,7 @@ export default function Upload() {
             className="hidden" 
             accept=".pdf,.docx,.txt"
             onChange={(e) => {
-              // Implementation omitted for brevity (similar to drop)
+              if (e.target.files) handleFiles(Array.from(e.target.files));
             }}
           />
           <label htmlFor="file-upload" className="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors cursor-pointer shadow-lg shadow-primary/20">
@@ -100,7 +132,7 @@ export default function Upload() {
         
         <div className="mt-6 flex items-center justify-between text-sm text-textMuted p-4 rounded-lg bg-surface/30 border border-white/5">
           <div className="flex items-center gap-2">
-            <Settings size={16} /> Assigning to: <strong className="text-white">Backend Software Engineer</strong>
+            <Settings size={16} /> Assigning to: <strong className="text-white">{job ? job.title : 'Loading...'}</strong>
           </div>
           <button className="text-primary hover:underline">Change Job</button>
         </div>
@@ -121,7 +153,7 @@ export default function Upload() {
             {files.map(f => (
               <div key={f.id} className="p-4 rounded-lg bg-surface/50 border border-white/5 relative overflow-hidden group">
                 {/* Progress bar background */}
-                {f.status === 'PROCESSING' && (
+                {(f.status === 'PROCESSING' || f.status === 'UPLOADING') && (
                   <div className="absolute inset-0 bg-primary/5">
                     <div className="h-full bg-primary/10 transition-all duration-300" style={{ width: `${f.progress}%` }} />
                   </div>
@@ -131,11 +163,11 @@ export default function Upload() {
                   <div className="flex items-center gap-2 overflow-hidden pr-2">
                     {f.status === 'COMPLETED' ? <CheckCircle size={16} className="text-success shrink-0" /> :
                      f.status === 'FAILED' ? <AlertCircle size={16} className="text-danger shrink-0" /> :
-                     f.status === 'PROCESSING' ? <Loader size={16} className="text-accent animate-spin shrink-0" /> :
+                     (f.status === 'PROCESSING' || f.status === 'UPLOADING') ? <Loader size={16} className="text-accent animate-spin shrink-0" /> :
                      <FileText size={16} className="text-textMuted shrink-0" />}
                     <span className="font-medium text-sm truncate">{f.name}</span>
                   </div>
-                  <button className="text-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button className="text-textMuted hover:text-white opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => setFiles(prev => prev.filter(file => file.id !== f.id))}>
                     <X size={14} />
                   </button>
                 </div>
@@ -145,9 +177,9 @@ export default function Upload() {
                     "text-xs font-bold tracking-wider",
                     f.status === 'COMPLETED' ? 'text-success' :
                     f.status === 'FAILED' ? 'text-danger' :
-                    f.status === 'PROCESSING' ? 'text-accent' : 'text-textMuted'
+                    (f.status === 'PROCESSING' || f.status === 'UPLOADING') ? 'text-accent' : 'text-textMuted'
                   )}>
-                    {f.status}
+                    {f.status} {f.error && `(${f.error})`}
                   </span>
                   
                   {f.status === 'COMPLETED' && (
