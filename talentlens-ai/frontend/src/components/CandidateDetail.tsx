@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, CheckCircle2, AlertTriangle, HelpCircle, FileText, Download, Share2, ChevronRight, X, ShieldAlert, BookOpen, Clock, Activity, Zap } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertTriangle, HelpCircle, FileText, Download, Share2, ChevronRight, X, ShieldAlert, BookOpen, Clock, Activity, Zap, ArrowUpRight } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { ReactFlow, Controls, Background } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
