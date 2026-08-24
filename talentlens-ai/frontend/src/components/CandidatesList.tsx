@@ -5,7 +5,7 @@ import {
   ChevronDown, ArrowUpRight, Download, Loader, AlertTriangle 
 } from 'lucide-react';
 import clsx from 'clsx';
-import { api, Job, MatchScore } from '../api';
+import { api, type Job, type MatchScore } from '../api';
 
 export default function CandidatesList() {
   const [job, setJob] = useState<Job | null>(null);

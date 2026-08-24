@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, FileSearch, Zap, AlertTriangle, ArrowUpRight, UploadCloud, Plus, Loader } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
-import { api, Job, MatchScore } from '../api';
+import { api, type Job, type MatchScore } from '../api';
 
 export default function Dashboard() {
   const [job, setJob] = useState<Job | null>(null);

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, Loader, X, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { api, Job } from '../api';
+import { api, type Job } from '../api';
 
 type UploadFile = {
   id: string; // candidate_id

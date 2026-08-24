@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, CheckCircle2, AlertTriangle, HelpCircle, FileText, Download, Share2, ChevronRight, X, ShieldAlert, BookOpen, Clock, Activity, Zap, ArrowUpRight, Loader } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { ReactFlow, Controls, Background, Node, Edge } from '@xyflow/react';
+import { ReactFlow, Controls, Background, type Node, type Edge } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import clsx from 'clsx';
-import { api, MatchScore } from '../api';
+import { api, type MatchScore } from '../api';
 
 export default function CandidateDetail() {
   const { id } = useParams();
