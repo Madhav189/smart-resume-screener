@@ -1,0 +1,19 @@
+Priya Sharma
+Frontend Developer
+priya@example.com
+
+Summary
+Creative frontend developer focused on building interactive and responsive user interfaces.
+
+Skills
+JavaScript, TypeScript, React, Vue.js, Tailwind CSS, HTML/CSS, Webpack
+
+Experience
+UI Engineer | Creative Web Agency | 2022 - Present
+- Built a responsive single-page application using React and TypeScript.
+- Integrated REST APIs with the frontend architecture.
+- Improved application load time by 30% through code splitting and lazy loading.
+- Designed UI components using Tailwind CSS and Framer Motion.
+
+Education
+B.S. Information Technology | State University | 2021

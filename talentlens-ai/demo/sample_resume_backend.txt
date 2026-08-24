@@ -1,0 +1,19 @@
+Rahul Kumar
+Backend Engineer
+rahul@example.com | 555-0123
+
+Summary
+Highly skilled backend engineer with 3+ years of experience building scalable, distributed systems.
+
+Skills
+Java, Python, PostgreSQL, MySQL, Redis, REST APIs, Microservices, Git, Docker
+
+Experience
+Backend Developer | Tech Solutions Inc | 2021 - Present
+- Developed a concurrent Java TCP server using thread-pool based request handling, improving throughput by 40%.
+- Designed and implemented REST APIs using Python and FastAPI for a high-traffic e-commerce platform.
+- Optimized complex PostgreSQL queries, reducing latency by 40%.
+- Implemented Redis-style LRU/LFU eviction for an in-memory caching layer, improving data retrieval speeds.
+
+Education
+B.S. Computer Science | University of Technology | 2020

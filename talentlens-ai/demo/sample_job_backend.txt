@@ -1,0 +1,19 @@
+Job Title: Backend Software Engineer
+Department: Engineering
+
+We are looking for a Backend Software Engineer to join our core infrastructure team. You will be responsible for building scalable distributed backend systems.
+
+Requirements:
+- 2+ years of backend development experience.
+- Strong proficiency in Java and Python.
+- Experience building REST APIs.
+- Solid understanding of SQL and relational databases (PostgreSQL preferred).
+- Familiarity with in-memory data stores like Redis.
+- Experience deploying applications with Docker and AWS.
+
+Nice to have:
+- Experience with Spring Boot.
+- Familiarity with Kubernetes.
+- Bachelor's degree in Computer Science.
+
+You should have excellent problem-solving skills and be able to communicate effectively within a team environment.
