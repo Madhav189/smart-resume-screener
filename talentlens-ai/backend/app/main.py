@@ -7,6 +7,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import models to ensure they are registered with Base.metadata BEFORE create_all
+from .models import domain
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
