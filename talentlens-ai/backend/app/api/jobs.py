@@ -47,4 +47,9 @@ def get_job(job_id: str, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=list[schemas.Job])
 def get_jobs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(models.Job).offset(skip).limit(limit).all()
+    try:
+        jobs = db.query(models.Job).offset(skip).limit(limit).all()
+        return jobs
+    except Exception as e:
+        import traceback
+        raise HTTPException(status_code=500, detail=traceback.format_exc())
